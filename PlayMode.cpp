@@ -38,24 +38,26 @@ Load< Scene > apple_scene(LoadTagDefault, []() -> Scene const * {
 
 PlayMode::PlayMode() : scene(*apple_scene) {
 	//get pointers to leg for convenience:
-	// for (auto &transform : scene.transforms) {
-	// 	if (transform.name == "Hip.FL") hip = &transform;
-	// 	else if (transform.name == "UpperLeg.FL") upper_leg = &transform;
-	// 	else if (transform.name == "LowerLeg.FL") lower_leg = &transform;
-	// }
-	// if (hip == nullptr) throw std::runtime_error("Hip not found.");
-	// if (upper_leg == nullptr) throw std::runtime_error("Upper leg not found.");
-	// if (lower_leg == nullptr) throw std::runtime_error("Lower leg not found.");
-
-	// hip_base_rotation = hip->rotation;
-	// upper_leg_base_rotation = upper_leg->rotation;
-	// lower_leg_base_rotation = lower_leg->rotation;
-
 	for (auto &transform : scene.transforms) {
 		if (transform.name == "apple") apple = &transform;
+		if (transform.name == "apple1") apple1 = &transform;
+		if (transform.name == "apple2") apple2 = &transform;
+		if (transform.name == "apple3") apple3 = &transform;
+		if (transform.name == "apple4") apple4 = &transform;
+		if (transform.name == "apple5") apple5 = &transform;
 	}
 	if (apple == nullptr) throw std::runtime_error("Apple to be rolled not found.");
+	if (apple1 == nullptr) throw std::runtime_error("Apple1 to be rolled not found.");
+	if (apple2 == nullptr) throw std::runtime_error("Apple2 to be rolled not found.");
+	if (apple3 == nullptr) throw std::runtime_error("Apple3 to be rolled not found.");
+	if (apple4 == nullptr) throw std::runtime_error("Apple4 to be rolled not found.");
+	if (apple5 == nullptr) throw std::runtime_error("Apple5 to be rolled not found.");
 	apple_base_rotation = apple->rotation;
+	apple1_base_rotation = apple->rotation;
+	apple2_base_rotation = apple->rotation;
+	apple3_base_rotation = apple->rotation;
+	apple4_base_rotation = apple->rotation;
+	apple5_base_rotation = apple->rotation;
 
 	//get pointer to camera for convenience:
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
@@ -68,10 +70,7 @@ PlayMode::~PlayMode() {
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
 
 	if (evt.type == SDL_KEYDOWN) {
-		if (evt.key.keysym.sym == SDLK_ESCAPE) {
-			SDL_SetRelativeMouseMode(SDL_FALSE);
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_a) {
+		if (evt.key.keysym.sym == SDLK_a) {
 			left.downs += 1;
 			left.pressed = true;
 			return true;
@@ -88,25 +87,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			right.pressed = false;
 			return true;
 		}
-	} else if (evt.type == SDL_MOUSEBUTTONDOWN) {
-		if (SDL_GetRelativeMouseMode() == SDL_FALSE) {
-			SDL_SetRelativeMouseMode(SDL_TRUE);
-			return true;
-		}
-	} else if (evt.type == SDL_MOUSEMOTION) {
-		if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
-			glm::vec2 motion = glm::vec2(
-				evt.motion.xrel / float(window_size.y),
-				-evt.motion.yrel / float(window_size.y)
-			);
-			camera->transform->rotation = glm::normalize(
-				camera->transform->rotation
-				* glm::angleAxis(-motion.x * camera->fovy, glm::vec3(0.0f, 1.0f, 0.0f))
-				* glm::angleAxis(motion.y * camera->fovy, glm::vec3(1.0f, 0.0f, 0.0f))
-			);
-			return true;
-		}
-	}
+	} 
 
 	return false;
 }
@@ -120,21 +101,74 @@ void PlayMode::update(float elapsed) {
 		glm::radians(700.0f * wobble),
 		glm::vec3(1.0f, 0.0f, 0.0f)
 	);
-	apple->position = apple->position + glm::vec3(-0.1f,0.0f,-0.03f);
-	
+	apple1->rotation = apple1_base_rotation * glm::angleAxis(
+		glm::radians(900.0f * wobble),
+		glm::vec3(0.0f, -1.0f, 0.0f)
+	);
+	apple2->rotation = apple2_base_rotation * glm::angleAxis(
+		glm::radians(600.0f * wobble),
+		glm::vec3(1.0f, 0.0f, 0.0f)
+	);
+	apple3->rotation = apple3_base_rotation * glm::angleAxis(
+		glm::radians(700.0f * wobble),
+		glm::vec3(0.0f, -1.0f, 0.0f)
+	);
+	apple4->rotation = apple4_base_rotation * glm::angleAxis(
+		glm::radians(800.0f * wobble),
+		glm::vec3(0.0f, -1.0f, 0.0f)
+	);
+	apple5->rotation = apple5_base_rotation * glm::angleAxis(
+		glm::radians(900.0f * wobble),
+		glm::vec3(1.0f, 0.0f, 0.0f)
+	);
 
-	// hip->rotation = hip_base_rotation * glm::angleAxis(
-	// 	glm::radians(5.0f * std::sin(wobble * 2.0f * float(M_PI))),
-	// 	glm::vec3(0.0f, 1.0f, 0.0f)
-	// );
-	// upper_leg->rotation = upper_leg_base_rotation * glm::angleAxis(
-	// 	glm::radians(7.0f * std::sin(wobble * 2.0f * 2.0f * float(M_PI))),
-	// 	glm::vec3(0.0f, 0.0f, 1.0f)
-	// );
-	// lower_leg->rotation = lower_leg_base_rotation * glm::angleAxis(
-	// 	glm::radians(10.0f * std::sin(wobble * 3.0f * 2.0f * float(M_PI))),
-	// 	glm::vec3(0.0f, 0.0f, 1.0f)
-	// );
+	apple->position = apple->position + glm::vec3(-0.09f,0.0f,-0.038f);
+	apple1->position = apple1->position + glm::vec3(-0.09f,0.0f,-0.038f);
+	apple2->position = apple2->position + glm::vec3(-0.09f,0.0f,-0.038f);
+	apple3->position = apple3->position + glm::vec3(-0.09f,0.0f,-0.03f);
+	apple4->position = apple4->position + glm::vec3(-0.09f,0.0f,-0.03f);
+	apple5->position = apple5->position + glm::vec3(-0.09f,0.0f,-0.03f);
+
+	//collision
+	
+	if (camera->transform->position.y <= apple->position.y + gap &&
+		camera->transform->position.y >= apple->position.y - gap &&
+		apple->position.x <= camera->transform->position.x) {
+			--life;
+	}
+	if (camera->transform->position.y <= apple1->position.y + gap &&
+		camera->transform->position.y >= apple1->position.y - gap &&
+		apple1->position.x <= camera->transform->position.x) {
+			--life;
+	}
+	if (camera->transform->position.y <= apple2->position.y + gap &&
+		camera->transform->position.y >= apple2->position.y - gap &&
+		apple2->position.x <= camera->transform->position.x) {
+			--life;
+	}
+	if (camera->transform->position.y <= apple3->position.y + gap &&
+		camera->transform->position.y >= apple3->position.y - gap &&
+		apple3->position.x <= camera->transform->position.x) {
+			--life;
+	}
+	if (camera->transform->position.y <= apple4->position.y + gap &&
+		camera->transform->position.y >= apple4->position.y - gap &&
+		apple4->position.x <= camera->transform->position.x) {
+			--life;
+	}
+	if (camera->transform->position.y <= apple5->position.y + gap &&
+		camera->transform->position.y >= apple5->position.y - gap &&
+		apple5->position.x <= camera->transform->position.x) {
+			--life;
+	}
+	if (life <=0 && !game) game = false;
+
+	if (apple->position.x < -26.0f || apple->position.z < -2.5f) {
+		apple->position = glm::vec3(50.f,-1.3f,18.f);
+		std::cout << "new position for apple!" << std::endl;
+	}
+	// std::cout << apple->position.x<<", "<<apple->position.y<<", "<<apple->position.z<<std::endl;
+	std::cout << camera->transform->position.x<<", "<<camera->transform->position.y<<", "<<camera->transform->position.z<<std::endl;
 
 	//move camera:
 	{
@@ -195,14 +229,42 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		));
 
 		constexpr float H = 0.09f;
-		lines.draw_text("Use A to go left D to go right. Dodge the rolling apples!",
+		float ofs = 2.0f / drawable_size.y;
+		if (!life && game){
+			lines.draw_text("Game Over",
 			glm::vec3(-aspect + 0.4f * H, 0.85 + 0.3f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
-		float ofs = 2.0f / drawable_size.y;
-		lines.draw_text("Use A to go left D to go right. Dodge the rolling apples!",
-			glm::vec3(-aspect + 0.2f * H + ofs, 0.85 + + 0.1f * H + ofs, 0.0),
-			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
-			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+			lines.draw_text("Game Over",
+				glm::vec3(-aspect + 0.2f * H + ofs, 0.85 + + 0.1f * H + ofs, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		} else {
+			lines.draw_text("Use A to go left D to go right. Dodge the rolling apples!",
+				glm::vec3(-aspect + 0.4f * H, 0.85 + 0.3f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0x00, 0x00, 0x00, 0x00));
+			lines.draw_text("Use A to go left D to go right. Dodge the rolling apples!",
+				glm::vec3(-aspect + 0.2f * H + ofs, 0.85 + + 0.1f * H + ofs, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		}
+		
+		if (life == 2) {
+			lines.draw_text("2 lives left",
+				glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		} else if (life == 1) {
+			lines.draw_text("1 life left",
+				glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		} else {
+			lines.draw_text("0 life left",
+				glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		}
 	}
 }

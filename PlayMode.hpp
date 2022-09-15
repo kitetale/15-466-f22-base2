@@ -30,18 +30,25 @@ struct PlayMode : Mode {
 	//apple to roll
 	Scene::Transform *apple = nullptr;
 	glm::quat apple_base_rotation;
+	Scene::Transform *apple1 = nullptr;
+	glm::quat apple1_base_rotation;
+	Scene::Transform *apple2 = nullptr;
+	glm::quat apple2_base_rotation;
+	Scene::Transform *apple3 = nullptr;
+	glm::quat apple3_base_rotation;
+	Scene::Transform *apple4 = nullptr;
+	glm::quat apple4_base_rotation;
+	Scene::Transform *apple5 = nullptr;
+	glm::quat apple5_base_rotation;
 
-
-	//hexapod leg to wobble:
-	Scene::Transform *hip = nullptr;
-	Scene::Transform *upper_leg = nullptr;
-	Scene::Transform *lower_leg = nullptr;
-	glm::quat hip_base_rotation;
-	glm::quat upper_leg_base_rotation;
-	glm::quat lower_leg_base_rotation;
 	float wobble = 0.0f;
 	
 	//camera:
 	Scene::Camera *camera = nullptr;
+
+	//life (score)
+	uint8_t life = 2;
+	bool game = true;
+	float gap = 0.0f;
 
 };
