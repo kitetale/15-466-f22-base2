@@ -27,6 +27,11 @@ struct PlayMode : Mode {
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
 
+	//apple to roll
+	Scene::Transform *apple = nullptr;
+	glm::quat apple_base_rotation;
+
+
 	//hexapod leg to wobble:
 	Scene::Transform *hip = nullptr;
 	Scene::Transform *upper_leg = nullptr;

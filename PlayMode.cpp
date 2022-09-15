@@ -51,6 +51,12 @@ PlayMode::PlayMode() : scene(*apple_scene) {
 	// upper_leg_base_rotation = upper_leg->rotation;
 	// lower_leg_base_rotation = lower_leg->rotation;
 
+	for (auto &transform : scene.transforms) {
+		if (transform.name == "apple") apple = &transform;
+	}
+	if (apple == nullptr) throw std::runtime_error("Apple to be rolled not found.");
+	apple_base_rotation = apple->rotation;
+
 	//get pointer to camera for convenience:
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
@@ -73,27 +79,13 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			right.downs += 1;
 			right.pressed = true;
 			return true;
-		} else if (evt.key.keysym.sym == SDLK_w) {
-			up.downs += 1;
-			up.pressed = true;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_s) {
-			down.downs += 1;
-			down.pressed = true;
-			return true;
-		}
+		} 
 	} else if (evt.type == SDL_KEYUP) {
 		if (evt.key.keysym.sym == SDLK_a) {
 			left.pressed = false;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_d) {
 			right.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_w) {
-			up.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_s) {
-			down.pressed = false;
 			return true;
 		}
 	} else if (evt.type == SDL_MOUSEBUTTONDOWN) {
@@ -123,7 +115,13 @@ void PlayMode::update(float elapsed) {
 
 	//slowly rotates through [0,1):
 	wobble += elapsed / 10.0f;
-	wobble -= std::floor(wobble);
+
+	apple->rotation = apple_base_rotation * glm::angleAxis(
+		glm::radians(700.0f * wobble),
+		glm::vec3(1.0f, 0.0f, 0.0f)
+	);
+	apple->position = apple->position + glm::vec3(-0.1f,0.0f,-0.03f);
+	
 
 	// hip->rotation = hip_base_rotation * glm::angleAxis(
 	// 	glm::radians(5.0f * std::sin(wobble * 2.0f * float(M_PI))),
@@ -146,8 +144,6 @@ void PlayMode::update(float elapsed) {
 		glm::vec2 move = glm::vec2(0.0f);
 		if (left.pressed && !right.pressed) move.x =-1.0f;
 		if (!left.pressed && right.pressed) move.x = 1.0f;
-		if (down.pressed && !up.pressed) move.y =-1.0f;
-		if (!down.pressed && up.pressed) move.y = 1.0f;
 
 		//make it so that moving diagonally doesn't go faster:
 		if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
@@ -163,8 +159,6 @@ void PlayMode::update(float elapsed) {
 	//reset button press counters:
 	left.downs = 0;
 	right.downs = 0;
-	up.downs = 0;
-	down.downs = 0;
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
