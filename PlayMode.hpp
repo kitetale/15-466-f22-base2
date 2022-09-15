@@ -49,6 +49,6 @@ struct PlayMode : Mode {
 	//life (score)
 	uint8_t life = 2;
 	bool game = true;
-	float gap = 0.0f;
+	float gap = 0.05f;
 
 };

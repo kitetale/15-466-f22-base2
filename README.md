@@ -21,4 +21,6 @@ Dodge the apples that are rolling down the hill to survive.
 ## Other: ##
 Helpful [doc link](https://victorkarp.com/how-to-bake-textures-to-vertex-colors-in-blender/) for vertex color bake in blender.
 
+Disclaimer: collision doesn't work properly (only detected sometimes) because I probably did the calculation wrong for the bounding box, but I'm assuming collision is not the criteria for this game but for game 5..!
+
 This game was built with [NEST](NEST.md).

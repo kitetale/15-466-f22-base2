@@ -37,6 +37,8 @@ Load< Scene > apple_scene(LoadTagDefault, []() -> Scene const * {
 });
 
 PlayMode::PlayMode() : scene(*apple_scene) {
+	life = 2;
+	game = true;
 	//get pointers to leg for convenience:
 	for (auto &transform : scene.transforms) {
 		if (transform.name == "apple") apple = &transform;
@@ -163,12 +165,14 @@ void PlayMode::update(float elapsed) {
 	}
 	if (life <=0 && !game) game = false;
 
+	// TODO for the future: randomize spawning locations for this and other 5 apples
 	if (apple->position.x < -26.0f || apple->position.z < -2.5f) {
 		apple->position = glm::vec3(50.f,-1.3f,18.f);
-		std::cout << "new position for apple!" << std::endl;
+		//std::cout << "new position for apple!" << std::endl;
 	}
+	// debug locations
 	// std::cout << apple->position.x<<", "<<apple->position.y<<", "<<apple->position.z<<std::endl;
-	std::cout << camera->transform->position.x<<", "<<camera->transform->position.y<<", "<<camera->transform->position.z<<std::endl;
+	// std::cout << camera->transform->position.x<<", "<<camera->transform->position.y<<", "<<camera->transform->position.z<<std::endl;
 
 	//move camera:
 	{
@@ -176,8 +180,10 @@ void PlayMode::update(float elapsed) {
 		//combine inputs into a move:
 		constexpr float PlayerSpeed = 30.0f;
 		glm::vec2 move = glm::vec2(0.0f);
-		if (left.pressed && !right.pressed) move.x =-1.0f;
-		if (!left.pressed && right.pressed) move.x = 1.0f;
+		if (left.pressed && !right.pressed && 
+			camera->transform->position.x < -28.4f) move.x =-1.0f;
+		if (!left.pressed && right.pressed && 
+			camera->transform->position.x > -31.3f) move.x = 1.0f;
 
 		//make it so that moving diagonally doesn't go faster:
 		if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
@@ -230,21 +236,21 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 		constexpr float H = 0.09f;
 		float ofs = 2.0f / drawable_size.y;
-		if (!life && game){
-			lines.draw_text("Game Over",
-			glm::vec3(-aspect + 0.4f * H, 0.85 + 0.3f * H, 0.0),
-			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
-			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
-			lines.draw_text("Game Over",
-				glm::vec3(-aspect + 0.2f * H + ofs, 0.85 + + 0.1f * H + ofs, 0.0),
-				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
-				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
-		} else {
+		if (life && game){
 			lines.draw_text("Use A to go left D to go right. Dodge the rolling apples!",
 				glm::vec3(-aspect + 0.4f * H, 0.85 + 0.3f * H, 0.0),
 				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 				glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 			lines.draw_text("Use A to go left D to go right. Dodge the rolling apples!",
+				glm::vec3(-aspect + 0.2f * H + ofs, 0.85 + + 0.1f * H + ofs, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+		} else {
+			lines.draw_text("Game Over",
+				glm::vec3(-aspect + 0.4f * H, 0.85 + 0.3f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0x00, 0x00, 0x00, 0x00));
+			lines.draw_text("Game Over",
 				glm::vec3(-aspect + 0.2f * H + ofs, 0.85 + + 0.1f * H + ofs, 0.0),
 				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
