@@ -18,7 +18,7 @@ The apple committee decided that your behavior of punching holes through the app
 Dodge the apples that are rolling down the hill to survive.
 
 
-
+## Other: ##
 Helpful [doc link](https://victorkarp.com/how-to-bake-textures-to-vertex-colors-in-blender/) for vertex color bake in blender.
 
 This game was built with [NEST](NEST.md).
